@@ -16,8 +16,8 @@ import type {
  */
 export function getDefaultConfig(): NewsletterConfig {
   return {
-    sources: [],
-    toolRadarSources: [],
+    sources: getDefaultSources(),
+    toolRadarSources: getDefaultToolRadarSources(),
     categories: getDefaultCategories(),
     contentFilter: getDefaultContentFilter(),
     articleCaps: getDefaultArticleCaps(),
@@ -182,7 +182,7 @@ function getDefaultEmailConfig(): EmailConfig {
   return {
     provider: 'resend',
     apiKey: process.env.RESEND_API_KEY ?? '',
-    from: 'newsletter@example.com',
+    from: 'AI Pulse <onboarding@resend.dev>',
   };
 }
 
@@ -193,3 +193,39 @@ function getDefaultLLMConfig(): LLMConfig {
     apiKeyEnvVar: 'LLM_API_KEY',
   };
 }
+
+
+function getDefaultSources(): Source[] {
+  return [
+    // Anthropic / Claude
+    { id: 'anthropic-blog', name: 'Anthropic Blog', url: 'https://www.anthropic.com/rss.xml', type: 'rss', categories: ['anthropic-claude'], enabled: true },
+    { id: 'anthropic-news', name: 'Anthropic News', url: 'https://www.anthropic.com/news/rss.xml', type: 'rss', categories: ['anthropic-claude'], enabled: true },
+
+    // OpenAI
+    { id: 'openai-blog', name: 'OpenAI Blog', url: 'https://openai.com/blog/rss.xml', type: 'rss', categories: ['openai'], enabled: true },
+    { id: 'openai-news', name: 'OpenAI News', url: 'https://openai.com/index/rss.xml', type: 'rss', categories: ['openai'], enabled: true },
+
+    // Google AI
+    { id: 'google-ai-blog', name: 'Google AI Blog', url: 'https://blog.google/technology/ai/rss/', type: 'rss', categories: ['google'], enabled: true },
+    { id: 'deepmind-blog', name: 'DeepMind Blog', url: 'https://deepmind.google/blog/rss.xml', type: 'rss', categories: ['google'], enabled: true },
+
+    // AWS
+    { id: 'aws-ml-blog', name: 'AWS ML Blog', url: 'https://aws.amazon.com/blogs/machine-learning/feed/', type: 'rss', categories: ['aws'], enabled: true },
+    { id: 'aws-news', name: 'AWS News', url: 'https://aws.amazon.com/blogs/aws/feed/', type: 'rss', categories: ['aws'], enabled: true },
+
+    // Builder Tools & Open Source
+    { id: 'huggingface-blog', name: 'Hugging Face Blog', url: 'https://huggingface.co/blog/feed.xml', type: 'rss', categories: ['builder-tools-oss'], enabled: true },
+    { id: 'the-verge-ai', name: 'The Verge AI', url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml', type: 'rss', categories: ['builder-tools-oss'], enabled: true },
+    { id: 'techcrunch-ai', name: 'TechCrunch AI', url: 'https://techcrunch.com/category/artificial-intelligence/feed/', type: 'rss', categories: ['builder-tools-oss'], enabled: true },
+    { id: 'ars-ai', name: 'Ars Technica AI', url: 'https://feeds.arstechnica.com/arstechnica/technology-lab', type: 'rss', categories: ['builder-tools-oss'], enabled: true },
+  ];
+}
+
+function getDefaultToolRadarSources(): Source[] {
+  return [
+    { id: 'hn-tools', name: 'Hacker News', url: 'https://news.ycombinator.com', type: 'tool-radar', categories: ['builder-tools-oss'], enabled: true },
+  ];
+}
+
+/** Default subscriber email */
+export const DEFAULT_SUBSCRIBER_EMAIL = 'raghavakumar85@gmail.com';

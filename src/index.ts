@@ -7,7 +7,7 @@
  */
 
 import type Database from 'better-sqlite3';
-import { loadConfig } from './config';
+import { loadConfig, DEFAULT_SUBSCRIBER_EMAIL } from './config';
 import { initDatabase } from './database';
 import {
   SourceRepo,
@@ -52,6 +52,27 @@ const digestRepo = new DigestRepo(db);
 const subscriberRepo = new SubscriberRepo(db);
 const deliveryLogRepo = new DeliveryLogRepo(db);
 console.log('[init] Repositories created');
+
+// ---------------------------------------------------------------------------
+// 3.5 Seed default sources and subscriber (idempotent)
+// ---------------------------------------------------------------------------
+for (const source of [...config.sources, ...config.toolRadarSources]) {
+  if (!sourceRepo.getByUrl(source.url)) {
+    sourceRepo.create(source);
+    console.log(`[seed] Added source: ${source.name}`);
+  }
+}
+
+if (DEFAULT_SUBSCRIBER_EMAIL && !subscriberRepo.getByEmail(DEFAULT_SUBSCRIBER_EMAIL)) {
+  subscriberRepo.create({
+    email: DEFAULT_SUBSCRIBER_EMAIL,
+    status: 'active',
+    subscribedAt: new Date(),
+    consecutiveBounces: 0,
+  });
+  console.log(`[seed] Added subscriber: ${DEFAULT_SUBSCRIBER_EMAIL}`);
+}
+console.log('[seed] Seeding complete');
 
 // ---------------------------------------------------------------------------
 // 4. Create component instances
