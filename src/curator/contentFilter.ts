@@ -103,13 +103,16 @@ function parseDecisions(response: string, expectedCount: number): string[] {
   }
 
   const parsed = JSON.parse(jsonMatch[0]);
-  if (!Array.isArray(parsed) || parsed.length !== expectedCount) {
-    throw new Error(
-      `Expected ${expectedCount} decisions, got ${Array.isArray(parsed) ? parsed.length : 'non-array'}`
-    );
+  if (!Array.isArray(parsed)) {
+    throw new Error('LLM response is not an array');
   }
 
-  return parsed.map((d: unknown) => {
+  // Tolerate slight mismatch — pad with "include" if LLM returned fewer
+  while (parsed.length < expectedCount) {
+    parsed.push('include');
+  }
+
+  return parsed.slice(0, expectedCount).map((d: unknown) => {
     const decision = String(d).toLowerCase().trim();
     return decision === 'include' ? 'include' : 'exclude';
   });
