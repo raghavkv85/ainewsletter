@@ -29,7 +29,9 @@ import { CategoryManager } from './config/categoryManager';
 // ---------------------------------------------------------------------------
 // 1. Load configuration
 // ---------------------------------------------------------------------------
-const configPath = process.argv[2] || undefined;
+const configPath = process.argv[2] && !['run-pipeline', 'add-source', 'remove-source', 'list-sources', 'add-subscriber', 'remove-subscriber', 'list-subscribers', 'list-archive'].includes(process.argv[2])
+  ? process.argv[2]
+  : undefined;
 const config = loadConfig(configPath);
 console.log('[init] Configuration loaded', configPath ? `from ${configPath}` : '(defaults)');
 
