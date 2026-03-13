@@ -102,7 +102,6 @@ export class DeliveryEngineImpl implements DeliveryEngine {
     const html = this.renderHtml(digest);
     const plainText = this.renderPlainText(digest);
 
-    // Send emails
     const subject = `AI Pulse — ${digest.publishedAt.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
@@ -110,18 +109,7 @@ export class DeliveryEngineImpl implements DeliveryEngine {
       day: 'numeric',
     })}`;
 
-    const { sent, failed } = await sendToSubscribers({
-      html,
-      plainText,
-      subject,
-      subscribers,
-      emailConfig: this.emailConfig,
-      digestId: digest.id,
-      deliveryLogRepo: this.deliveryLogRepo,
-      unsubscribeBaseUrl: this.unsubscribeBaseUrl,
-    });
-
-    // Store digest in DB
+    // Store digest in DB FIRST (delivery_log references digest_id via FK)
     this.digestRepo.create({
       id: digest.id,
       publishedAt: digest.publishedAt,
@@ -155,7 +143,19 @@ export class DeliveryEngineImpl implements DeliveryEngine {
       }
     }
 
-    // Archive (placeholder)
+    // Now send emails (delivery_log can reference the digest)
+    const { sent, failed } = await sendToSubscribers({
+      html,
+      plainText,
+      subject,
+      subscribers,
+      emailConfig: this.emailConfig,
+      digestId: digest.id,
+      deliveryLogRepo: this.deliveryLogRepo,
+      unsubscribeBaseUrl: this.unsubscribeBaseUrl,
+    });
+
+    // Archive
     const archivedUrl = await this.archive(digest);
 
     return {
